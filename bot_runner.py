@@ -37,10 +37,6 @@ REQUIRED_ENV_VARS = [
     "HATHORA_APP_ID_BOTS",
 ]
 
-FLY_API_HOST = os.getenv("FLY_API_HOST", "https://api.machines.dev/v1")
-FLY_APP_NAME = os.getenv("FLY_APP_NAME", "pipecat-fly-example")
-FLY_API_KEY = os.getenv("FLY_API_KEY", "")
-FLY_HEADERS = {"Authorization": f"Bearer {FLY_API_KEY}", "Content-Type": "application/json"}
 
 daily_helpers = {}
 
@@ -130,7 +126,7 @@ async def start_bot(request: Request) -> JSONResponse:
     if not room or not token:
         raise HTTPException(status_code=500, detail=f"Failed to get token for room: {room_url}")
 
-    # Launch a new fly.io machine, or run as a shell process (not recommended)
+    # Launch a new Hathora process, or run as a shell process (not recommended)
     run_as_process = os.getenv("RUN_AS_PROCESS", False)
 
     if run_as_process:
@@ -147,7 +143,7 @@ async def start_bot(request: Request) -> JSONResponse:
         try:
             await spawn_hathora_process(room.url, token)
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to spawn VM: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to spawn Hathora process: {e}")
 
     # Grab a token for the user to join with
     user_token = await daily_helpers["rest"].get_token(room.url, MAX_SESSION_TIME)
